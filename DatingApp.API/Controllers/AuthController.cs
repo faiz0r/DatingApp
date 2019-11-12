@@ -19,7 +19,7 @@ namespace DatingApp.API.Controllers
         private readonly IAuthRepository _repo;
         private readonly IConfiguration _config;
 
-        public AuthController (IAuthRepository repo, IConfiguration config)
+        public AuthController(IAuthRepository repo, IConfiguration config)
         {
             _repo = repo;
             _config = config;
@@ -48,10 +48,12 @@ namespace DatingApp.API.Controllers
         [HttpPost("login")]
         public async Task<IActionResult> Login(UserForLoginDto userForLoginDto)
         {
+
             var userForLogin = await _repo.Login(userForLoginDto.Username.ToLower(), userForLoginDto.Password);
 
-            if(userForLogin == null)
-                Unauthorized();
+            if (userForLogin == null)
+                return Unauthorized();
+
 
             var claims = new[]
             {
@@ -69,15 +71,16 @@ namespace DatingApp.API.Controllers
                 Expires = DateTime.Now.AddDays(1),
                 SigningCredentials = creds
             };
-            
+
             var tokenHandler = new JwtSecurityTokenHandler();
 
             var token = tokenHandler.CreateToken(tokenDescriptor);
 
-            return Ok(new{
+            return Ok(new
+            {
                 token = tokenHandler.WriteToken(token)
             });
-            
         }
+
     }
 }
